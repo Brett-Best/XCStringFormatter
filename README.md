@@ -13,6 +13,21 @@ Build it with the active Swift 6.4 toolchain selected by `xcrun`:
 /usr/bin/xcrun swift build
 ```
 
+## Installation
+
+Consumers should install the command with [Mint](https://github.com/yonaskolb/Mint):
+
+```sh
+mint install Brett-Best/XCStringFormatter@main
+```
+
+Mint links the `xcstrings-format` executable into `~/.mint/bin` by default;
+ensure that directory is on your `PATH`, then invoke it directly:
+
+```sh
+xcstrings-format path/to/Localizable.xcstrings
+```
+
 The manifest uses
 `/Applications/Xcode.app/Contents/SharedFrameworks` by default. SwiftPM reads
 `XCSTRINGS_FORMAT_SHARED_FRAMEWORKS` from its process environment when it
