@@ -28,14 +28,16 @@ ensure that directory is on your `PATH`, then invoke it directly:
 xcstrings-format path/to/Localizable.xcstrings
 ```
 
-The manifest uses
-`/Applications/Xcode.app/Contents/SharedFrameworks` by default. SwiftPM reads
-`XCSTRINGS_FORMAT_SHARED_FRAMEWORKS` from its process environment when it
-evaluates the manifest, so an alternate compatible directory can be selected
-for a build or run:
+The manifest derives the framework directory from `DEVELOPER_DIR` when it is
+set, or from the selected Xcode's `SDKROOT` supplied by `xcrun`. If neither
+identifies an Xcode installation, it falls back to
+`/Applications/Xcode.app/Contents/SharedFrameworks`.
+
+Select a specific Xcode for a build with `DEVELOPER_DIR`, or use
+`xcode-select` to change the system selection:
 
 ```sh
-XCSTRINGS_FORMAT_SHARED_FRAMEWORKS=/path/to/SharedFrameworks \
+DEVELOPER_DIR=/Applications/Xcode-beta.app \
   /usr/bin/xcrun swift build
 ```
 
