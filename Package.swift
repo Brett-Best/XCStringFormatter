@@ -3,73 +3,13 @@
 import Foundation
 import PackageDescription
 
-/// SwiftPM evaluates this manifest in its own process context. Prefer the
-/// explicit Xcode selection, then the SDK selected by xcrun.
-func contentsDirectory(fromDeveloperDirectory developerDirectory: URL) -> URL? {
-    if developerDirectory.pathExtension == "app" {
-        return developerDirectory.appending(path: "Contents")
-    }
-
-    let contentsDirectory = developerDirectory.deletingLastPathComponent()
-    let xcodeDirectory = contentsDirectory.deletingLastPathComponent()
-
-    guard developerDirectory.lastPathComponent == "Developer",
-          contentsDirectory.lastPathComponent == "Contents",
-          xcodeDirectory.pathExtension == "app"
-    else {
-        return nil
-    }
-
-    return contentsDirectory
-}
-
-func contentsDirectory(fromSDKRoot sdkRoot: URL) -> URL? {
-    let sdkDirectory = sdkRoot.deletingLastPathComponent()
-    let platformDeveloperDirectory = sdkDirectory.deletingLastPathComponent()
-    let platformDirectory = platformDeveloperDirectory.deletingLastPathComponent()
-    let platformsDirectory = platformDirectory.deletingLastPathComponent()
-    let xcodeDeveloperDirectory = platformsDirectory.deletingLastPathComponent()
-    let contentsDirectory = xcodeDeveloperDirectory.deletingLastPathComponent()
-    let xcodeDirectory = contentsDirectory.deletingLastPathComponent()
-
-    guard sdkRoot.pathExtension == "sdk",
-          sdkDirectory.lastPathComponent == "SDKs",
-          platformDeveloperDirectory.lastPathComponent == "Developer",
-          platformDirectory.pathExtension == "platform",
-          platformsDirectory.lastPathComponent == "Platforms",
-          xcodeDeveloperDirectory.lastPathComponent == "Developer",
-          contentsDirectory.lastPathComponent == "Contents",
-          xcodeDirectory.pathExtension == "app"
-    else {
-        return nil
-    }
-
-    return contentsDirectory
-}
-
-func sharedFrameworksDirectoryPath(for environment: [String: String]) -> URL {
-    if let developerDirectoryPath = environment["DEVELOPER_DIR"],
-       !developerDirectoryPath.isEmpty,
-       let contentsDirectory = contentsDirectory(
-           fromDeveloperDirectory: URL(filePath: developerDirectoryPath)
-       )
-    {
-        return contentsDirectory.appending(path: "SharedFrameworks")
-    }
-
-    if let sdkRootPath = environment["SDKROOT"],
-       !sdkRootPath.isEmpty,
-       let contentsDirectory = contentsDirectory(
-           fromSDKRoot: URL(filePath: sdkRootPath)
-       )
-    {
-        return contentsDirectory.appending(path: "SharedFrameworks")
-    }
-
-    return URL(filePath: "/Applications/Xcode.app/Contents/SharedFrameworks")
-}
-
-let sharedFrameworksDirectory = sharedFrameworksDirectoryPath(for: Context.environment)
+/// xcrun supplies SDKROOT for the Xcode selected by xcode-select or
+/// DEVELOPER_DIR. Six parent directories reach Xcode.app/Contents.
+let sharedFrameworksDirectory = (0 ..< 6).reduce(
+    URL(filePath: Context.environment["SDKROOT"]!)
+) { directory, _ in
+    directory.deletingLastPathComponent()
+}.appending(path: "SharedFrameworks")
 
 /// Swift 6.4 enables the features marked enabled_in "6" automatically. Keep
 /// only the still-upcoming features reported by the active Swift compiler:

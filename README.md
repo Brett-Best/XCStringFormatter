@@ -28,10 +28,9 @@ ensure that directory is on your `PATH`, then invoke it directly:
 xcstrings-format path/to/Localizable.xcstrings
 ```
 
-The manifest derives the framework directory from `DEVELOPER_DIR` when it is
-set, or from the selected Xcode's `SDKROOT` supplied by `xcrun`. If neither
-identifies an Xcode installation, it falls back to
-`/Applications/Xcode.app/Contents/SharedFrameworks`.
+The manifest derives the framework directory from the selected Xcode's
+`SDKROOT`, supplied by `xcrun`. Use `DEVELOPER_DIR` to select an Xcode for one
+command, or use `xcode-select` to change the system selection.
 
 Select a specific Xcode for a build with `DEVELOPER_DIR`, or use
 `xcode-select` to change the system selection:
